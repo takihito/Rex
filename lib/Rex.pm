@@ -32,11 +32,34 @@ sub create_index {
     my $key = $self->rex_key($args->{type}, $args->{key} );
 
     for my $v ( @{$args->{list}} ) {
-        $self->redis->rpush($key, $v);
+        return unless $self->redis->rpush($key, $v);
     }
 
     return 1;
 }
+
+sub rpush_index {
+    my ( $self, $args ) = @_;
+
+    my $key = $self->rex_key($args->{type}, $args->{key} );
+    return $self->redis->rpush($key, $args->{value}) if length($args->{value});
+
+    return;
+}
+
+sub lpush_index {
+    my ( $self, $args ) = @_;
+
+    my $key = $self->rex_key($args->{type}, $args->{key} );
+    return $self->redis->lpush($key, $args->{value}) if length($args->{value});
+
+    return;
+}
+
+
+$rex->copy_to_set('perl'); 
+
+
 
 sub rex_key {
     my ( $self, $type, $key ) = @_;
